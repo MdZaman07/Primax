@@ -1,0 +1,112 @@
+import type { ProjectManifest } from "./manifest";
+
+export const ascentManifest: ProjectManifest = {
+  project: {
+    id: "ascent-rouse-hill",
+    name: "Ascent — Tallawong Road, Rouse Hill",
+    version: "1.0.0",
+  },
+  style: {
+    palette: [
+      { name: "Maroon",   hex: "#410e2b", role: "brand-primary" },
+      { name: "Mauve",    hex: "#ad95b7", role: "brand-secondary" },
+      { name: "Lavender", hex: "#e4d4ee", role: "soft-accent" },
+      { name: "Cream",    hex: "#f0ece0", role: "background" },
+    ],
+    materials: {
+      flooring: { type: "timber-plank", hex: "#C49A6C" },
+      walls:    { type: "paint-matte",  hex: "#F7F6F2" },
+      ceiling:  { type: "paint-matte",  hex: "#FFFFFF" },
+    },
+    furniture: {
+      style: "contemporary-minimal",
+      primaryTones: ["#E5DFD2", "#1C1C1C", "#8B6914"],
+    },
+    typography: { heading: "Crista", body: "Liberation Sans" },
+  },
+  geometry: {
+    totalAreaM2: 84,
+    rooms: [
+      {
+        id: "living",
+        type: "living",
+        label: "Living",
+        bounds: { x: 0, y: 0, w: 5.5, h: 4.2 },
+        doors: [],
+        windows: [{ wall: "n", position: 0.2, width: 3.2 }],
+      },
+      {
+        id: "dining",
+        type: "dining",
+        label: "Dining",
+        bounds: { x: 5.5, y: 0, w: 3.0, h: 4.2 },
+        doors: [],
+        windows: [],
+      },
+      {
+        id: "kitchen",
+        type: "kitchen",
+        label: "Kitchen",
+        bounds: { x: 8.5, y: 0, w: 3.5, h: 4.2 },
+        doors: [{ wall: "s", position: 0.5, width: 0.9 }],
+        windows: [{ wall: "e", position: 0.3, width: 1.5 }],
+      },
+      {
+        id: "bed1",
+        type: "bedroom",
+        label: "Master Bedroom",
+        bounds: { x: 0, y: 4.2, w: 4.0, h: 3.8 },
+        doors: [{ wall: "s", position: 0.5, width: 0.9 }],
+        windows: [{ wall: "n", position: 0.3, width: 2.0 }],
+      },
+      {
+        id: "ensuite",
+        type: "bathroom",
+        label: "Ensuite",
+        bounds: { x: 4.0, y: 4.2, w: 2.0, h: 2.0 },
+        doors: [{ wall: "s", position: 0.5, width: 0.8 }],
+        windows: [],
+      },
+      {
+        id: "bed2",
+        type: "bedroom",
+        label: "Bedroom 2",
+        bounds: { x: 6.0, y: 4.2, w: 3.5, h: 3.8 },
+        doors: [{ wall: "s", position: 0.5, width: 0.9 }],
+        windows: [{ wall: "n", position: 0.3, width: 1.8 }],
+      },
+      {
+        id: "bathroom",
+        type: "bathroom",
+        label: "Bathroom",
+        bounds: { x: 9.5, y: 4.2, w: 2.5, h: 2.0 },
+        doors: [{ wall: "s", position: 0.5, width: 0.8 }],
+        windows: [],
+      },
+      {
+        id: "laundry",
+        type: "laundry",
+        label: "Laundry",
+        bounds: { x: 9.5, y: 6.2, w: 2.5, h: 1.8 },
+        doors: [{ wall: "w", position: 0.5, width: 0.8 }],
+        windows: [],
+      },
+      {
+        id: "balcony",
+        type: "balcony",
+        label: "Balcony",
+        bounds: { x: 0, y: -2.0, w: 8.5, h: 2.0 },
+        doors: [],
+        windows: [],
+      },
+      {
+        id: "hall",
+        type: "hall",
+        label: "Hall",
+        bounds: { x: 4.0, y: 6.2, w: 5.5, h: 2.0 },
+        doors: [],
+        windows: [],
+      },
+    ],
+  },
+};
