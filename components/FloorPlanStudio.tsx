@@ -109,6 +109,16 @@ export default function FloorPlanStudio({ initialProjects, initialBrands }: Floo
           >
             + Analyze New Project
           </button>
+          <button
+            onClick={async () => {
+              await fetch("/api/auth/logout", { method: "POST" });
+              window.location.href = "/login";
+            }}
+            className="text-xs text-white/40 hover:text-white/70 transition-colors"
+            title="Sign out"
+          >
+            Sign out
+          </button>
         </div>
       </header>
 
