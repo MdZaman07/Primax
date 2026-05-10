@@ -11,11 +11,10 @@ export async function POST(req: NextRequest) {
   const { floorPlan, renders, brandGuide, projectName, projectId } = await req.json();
 
   if (!floorPlan) {
-    return NextResponse.json({ error: "floorPlan (base64) is required" }, { status: 400 });
+    return NextResponse.json({ error: "floorPlan (data URL) is required" }, { status: 400 });
   }
 
   if (!hasRealCredentials()) {
-    // No real credentials — return static demo manifest with a hint header
     return NextResponse.json(ascentManifest, {
       headers: { "X-Manifest-Source": "demo-fallback" },
     });
@@ -29,6 +28,7 @@ export async function POST(req: NextRequest) {
       projectId ?? "new-project",
       projectName ?? "New Project"
     );
+
     return NextResponse.json(manifest, {
       headers: { "X-Manifest-Source": "gpt-4o-vision" },
     });

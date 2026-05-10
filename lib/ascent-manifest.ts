@@ -1,9 +1,11 @@
 import type { ProjectManifest } from "./manifest";
+import { getBrand } from "./brands";
 
 // Sanctuary Quarter — Apartment 1.01 (3 Bed, 115m²)
-// Floor plan dimensions from labeled 2D plan (all in metres)
-// Ascent brand guide: #410e2b maroon, #ad95b7 mauve, #e4d4ee lavender, #f0ece0 cream
-// Interior renders: pale blonde timber floor, white walls, white/cream furniture, black accents
+// Style comes from the Ascent brand library entry (extracted once, reused across all lots).
+// Geometry is lot-specific: exact labeled dimensions from the 2D plan.
+
+const ascentBrand = getBrand("ascent")!;
 
 export const ascentManifest: ProjectManifest = {
   project: {
@@ -11,28 +13,11 @@ export const ascentManifest: ProjectManifest = {
     name: "Sanctuary Quarter — Apartment 1.01",
     version: "1.0.0",
   },
-  style: {
-    palette: [
-      { name: "Maroon",   hex: "#410e2b", role: "brand-primary"   },
-      { name: "Mauve",    hex: "#ad95b7", role: "brand-secondary"  },
-      { name: "Lavender", hex: "#e4d4ee", role: "soft-accent"      },
-      { name: "Cream",    hex: "#f0ece0", role: "background"       },
-    ],
-    materials: {
-      flooring: { type: "timber-pale-blonde", hex: "#D8CCBA" }, // pale blonde timber from renders
-      walls:    { type: "paint-white",        hex: "#FFFFFF"  }, // white walls from renders
-      ceiling:  { type: "paint-white",        hex: "#FFFFFF"  },
-    },
-    furniture: {
-      style: "contemporary-minimal",
-      primaryTones: ["#F0EDE8", "#1C1C1C", "#C8860A"], // white/cream body, black accents, amber throw
-    },
-    typography: { heading: "Crista", body: "Liberation Sans" },
-  },
+  style: ascentBrand.style,
   geometry: {
     totalAreaM2: 115,
     rooms: [
-      // ── Top row: living spaces ───────────────────────────────────────────
+      // ── Top row ───────────────────────────────────────────────────────────
       {
         id: "dining", type: "dining", label: "Dining",
         bounds: { x: 0, y: 0, w: 3.8, h: 3.0 },
@@ -49,7 +34,7 @@ export const ascentManifest: ProjectManifest = {
         doors: [], windows: [],
       },
 
-      // ── Middle: kitchen + corridor + Bed01 + wardrobe + Terrace2 ────────
+      // ── Middle ────────────────────────────────────────────────────────────
       {
         id: "kitchen", type: "kitchen", label: "Kitchen",
         bounds: { x: 0, y: 3.0, w: 2.8, h: 2.7 },
@@ -77,7 +62,7 @@ export const ascentManifest: ProjectManifest = {
         doors: [], windows: [],
       },
 
-      // ── Bath + wardrobe + Bed02 ──────────────────────────────────────────
+      // ── Bath + Bed02 ──────────────────────────────────────────────────────
       {
         id: "bath", type: "bathroom", label: "Bath",
         bounds: { x: 0, y: 5.7, w: 2.8, h: 1.5 },
@@ -95,7 +80,7 @@ export const ascentManifest: ProjectManifest = {
         windows: [{ wall: "e", position: 0.3, width: 1.6 }],
       },
 
-      // ── Bottom: laundry + ensuite + wardrobe + Bed03 ────────────────────
+      // ── Bottom ────────────────────────────────────────────────────────────
       {
         id: "laundry", type: "laundry", label: "Laundry",
         bounds: { x: 0, y: 7.2, w: 1.5, h: 0.75 },
