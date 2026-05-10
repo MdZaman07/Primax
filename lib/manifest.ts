@@ -16,7 +16,7 @@ const WindowSchema = z.object({
 
 export const RoomSchema = z.object({
   id: z.string(),
-  type: z.enum(["living", "dining", "kitchen", "bedroom", "bathroom", "laundry", "balcony", "hall", "study"]),
+  type: z.enum(["living", "dining", "kitchen", "bedroom", "bathroom", "laundry", "balcony", "hall", "study", "closet"]),
   label: z.string(),
   bounds: z.object({ x: z.number(), y: z.number(), w: z.number(), h: z.number() }),
   doors: z.array(DoorSchema),

@@ -20,10 +20,11 @@ export default function AnalyzeDrawer({ onManifest, onClose }: AnalyzeDrawerProp
   const rendersRef = useRef<HTMLInputElement>(null);
   const bgRef = useRef<HTMLInputElement>(null);
 
-  const toBase64 = (file: File): Promise<string> =>
+  // Returns full data URL (includes MIME type) so OpenAI gets the correct image format
+  const toDataUrl = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve((reader.result as string).split(",")[1]);
+      reader.onload = () => resolve(reader.result as string);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
@@ -36,19 +37,19 @@ export default function AnalyzeDrawer({ onManifest, onClose }: AnalyzeDrawerProp
     setLoading(true);
     setError(null);
     try {
-      const [fpB64, ...renderB64s] = await Promise.all([
-        toBase64(floorPlan),
-        ...renders.map(toBase64),
+      const [fpUrl, ...renderUrls] = await Promise.all([
+        toDataUrl(floorPlan),
+        ...renders.map(toDataUrl),
       ]);
-      const bgB64 = brandGuide ? await toBase64(brandGuide) : null;
+      const bgUrl = brandGuide ? await toDataUrl(brandGuide) : null;
 
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          floorPlan: fpB64,
-          renders: renderB64s,
-          brandGuide: bgB64,
+          floorPlan: fpUrl,
+          renders: renderUrls,
+          brandGuide: bgUrl,
           projectName: projectName.trim(),
           projectId: projectName.trim().toLowerCase().replace(/\s+/g, "-"),
         }),

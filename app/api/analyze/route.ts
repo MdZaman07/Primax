@@ -3,14 +3,8 @@ import { analyzeProject } from "@/lib/analyze";
 import { ascentManifest } from "@/lib/ascent-manifest";
 
 function hasRealCredentials(): boolean {
-  const endpoint = process.env.AZURE_OPENAI_ENDPOINT ?? "";
-  const key = process.env.AZURE_OPENAI_API_KEY ?? "";
-  return (
-    endpoint.length > 0 &&
-    key.length > 0 &&
-    !endpoint.includes("your-resource") &&
-    key !== "your_key_here"
-  );
+  const key = process.env.OPENAI_API_KEY ?? "";
+  return key.length > 0 && key !== "your_key_here";
 }
 
 export async function POST(req: NextRequest) {
