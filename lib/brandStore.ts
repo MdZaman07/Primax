@@ -4,12 +4,16 @@ import type { StyleManifest } from "./manifest";
 
 const COLLECTION = "brands";
 
+// BrandRecord is what the DB returns — BrandEntry + the computed style fingerprint
+export type BrandRecord = BrandEntry & { styleHash: string };
+
 export interface BrandDoc {
   key: string;
   name: string;
   developer: string;
   description: string;
   style: StyleManifest;
+  styleHash: string;    // SHA-256[:8] of style — brand identity fingerprint
   seeded: boolean;      // true = came from the static library, false = user-uploaded
   createdAt: Date;
 }
@@ -24,19 +28,21 @@ export async function seedBrandsIfEmpty(): Promise<void> {
 
   await col.createIndex({ key: 1 }, { unique: true });
 
+  const { createHash } = await import("crypto");
   const docs: BrandDoc[] = BRAND_LIBRARY.map((b) => ({
     key: b.key,
     name: b.name,
     developer: b.developer,
     description: b.description,
     style: b.style,
+    styleHash: createHash("sha256").update(JSON.stringify(b.style)).digest("hex").slice(0, 8),
     seeded: true,
     createdAt: new Date(),
   }));
   await col.insertMany(docs);
 }
 
-export async function listBrands(): Promise<BrandEntry[]> {
+export async function listBrands(): Promise<BrandRecord[]> {
   const db = await getDb();
   const docs = await db
     .collection<BrandDoc>(COLLECTION)
@@ -50,10 +56,11 @@ export async function listBrands(): Promise<BrandEntry[]> {
     developer: d.developer,
     description: d.description,
     style: d.style,
+    styleHash: d.styleHash ?? "00000000",
   }));
 }
 
-export async function getBrandByKey(key: string): Promise<BrandEntry | null> {
+export async function getBrandByKey(key: string): Promise<BrandRecord | null> {
   const db = await getDb();
   const doc = await db
     .collection<BrandDoc>(COLLECTION)
@@ -65,21 +72,26 @@ export async function getBrandByKey(key: string): Promise<BrandEntry | null> {
     developer: doc.developer,
     description: doc.description,
     style: doc.style,
+    styleHash: doc.styleHash ?? "00000000",
   };
 }
 
 // Save a brand extracted from a new upload — stored alongside the seeded library entries
-export async function saveBrand(entry: BrandEntry): Promise<void> {
+export async function saveBrand(entry: BrandEntry): Promise<{ styleHash: string }> {
+  const { createHash } = await import("crypto");
+  const hash = createHash("sha256").update(JSON.stringify(entry.style)).digest("hex").slice(0, 8);
   const db = await getDb();
   await db.collection<BrandDoc>(COLLECTION).updateOne(
     { key: entry.key },
     {
       $set: {
         ...entry,
+        styleHash: hash,
         seeded: false,
         createdAt: new Date(),
       },
     },
     { upsert: true }
   );
+  return { styleHash: hash };
 }

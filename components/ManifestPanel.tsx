@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { ProjectManifest } from "@/lib/manifest";
-import type { BrandEntry } from "@/lib/brands";
+import type { BrandRecord } from "@/lib/brandStore";
 import type { ProjectEntry } from "@/lib/projectStore";
 
 interface ManifestPanelProps {
@@ -10,7 +10,7 @@ interface ManifestPanelProps {
   projects: ProjectEntry[];
   selectedProjectId: string | null;
   onProjectChange: (id: string | null) => void;
-  brands: BrandEntry[];
+  brands: BrandRecord[];
   selectedBrandKey: string | null;
   onBrandChange: (key: string | null) => void;
   onNewProject: () => void;
@@ -78,9 +78,9 @@ export default function ManifestPanel({
 
       {/* Header */}
       <div className="px-4 py-3 border-b border-stone-100">
-        <p className="text-[9px] uppercase tracking-widest text-stone-400 mb-0.5">Project Manifest</p>
+        <p className="text-[9px] uppercase tracking-widest text-stone-500 mb-0.5">Project Manifest</p>
         <h2 className="text-sm font-semibold text-stone-800 leading-tight">{manifest.project.name}</h2>
-        <p className="text-[10px] text-stone-400">v{manifest.project.version}</p>
+        <p className="text-[10px] text-stone-500">v{manifest.project.version}</p>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-5">
@@ -88,7 +88,7 @@ export default function ManifestPanel({
         {/* ── Projects ──────────────────────────────────────────────── */}
         <section>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[9px] uppercase tracking-wider text-stone-400">Projects</h3>
+            <h3 className="text-[10px] uppercase tracking-wider text-stone-500 font-medium">Projects</h3>
             <button
               onClick={onNewProject}
               className="text-[9px] text-[#410e2b] hover:text-[#5a1340] font-medium transition-colors"
@@ -130,9 +130,16 @@ export default function ManifestPanel({
                         ))}
                       </div>
                     </div>
-                    <p className="text-[9px] text-stone-400 leading-tight">
-                      {proj.geometry.rooms.length} rooms · {proj.geometry.totalAreaM2} m²
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] text-stone-500 leading-tight">
+                        {proj.geometry.rooms.length} rooms · {proj.geometry.totalAreaM2} m²
+                      </p>
+                      {proj.analyzedStyleHash && (
+                        <span className="font-mono text-[9px] text-stone-400" title="AI-extracted style fingerprint at analysis time">
+                          #{proj.analyzedStyleHash}
+                        </span>
+                      )}
+                    </div>
                   </button>
                 );
               })}
@@ -142,8 +149,8 @@ export default function ManifestPanel({
 
         {/* ── Brand Library ──────────────────────────────────────────── */}
         <section>
-          <h3 className="text-[9px] uppercase tracking-wider text-stone-400 mb-1.5">Brand Library</h3>
-          <p className="text-[10px] text-stone-400 mb-2 leading-tight">
+          <h3 className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-1.5">Brand Library</h3>
+          <p className="text-[10px] text-stone-500 mb-2 leading-tight">
             Same floor plan · swap brand · different output
           </p>
           <div className="space-y-1">
@@ -174,7 +181,14 @@ export default function ManifestPanel({
                       ))}
                     </div>
                   </div>
-                  <p className="text-[9px] text-stone-400 leading-tight">{brand.developer}</p>
+                  <div className="flex items-center justify-between mt-0.5">
+                    <p className="text-[10px] text-stone-500 leading-tight">{brand.developer}</p>
+                    {brand.styleHash && (
+                      <span className="font-mono text-[9px] text-stone-400" title="Brand style fingerprint">
+                        #{brand.styleHash}
+                      </span>
+                    )}
+                  </div>
                 </button>
               );
             })}
@@ -183,14 +197,14 @@ export default function ManifestPanel({
 
         {/* ── Colour Palette ─────────────────────────────────────────── */}
         <section>
-          <h3 className="text-[9px] uppercase tracking-wider text-stone-400 mb-2">Brand Palette</h3>
+          <h3 className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-2">Brand Palette</h3>
           <div className="space-y-1.5">
             {manifest.style.palette.map((c) => (
               <div key={c.role} className="flex items-center gap-2 text-xs">
                 <Swatch hex={c.hex} title={`${c.name} · ${c.hex}`} />
                 <span className="font-medium text-stone-700">{c.name}</span>
-                <span className="text-stone-400 font-mono text-[10px]">{c.hex}</span>
-                <span className="text-stone-300 text-[9px] ml-auto">{c.role}</span>
+                <span className="text-stone-600 font-mono text-[10px]">{c.hex}</span>
+                <span className="text-stone-400 text-[9px] ml-auto">{c.role}</span>
               </div>
             ))}
           </div>
@@ -198,30 +212,30 @@ export default function ManifestPanel({
 
         {/* ── Materials ──────────────────────────────────────────────── */}
         <section>
-          <h3 className="text-[9px] uppercase tracking-wider text-stone-400 mb-2">Materials · from renders</h3>
+          <h3 className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-2">Materials · from renders</h3>
           <div className="space-y-1.5">
             {(["flooring", "walls", "ceiling"] as const).map((key) => {
               const m = manifest.style.materials[key];
               return (
                 <div key={key} className="flex items-center gap-2 text-xs">
                   <Swatch hex={m.hex} />
-                  <span className="text-stone-400 w-11 capitalize text-[10px]">{key}</span>
-                  <span className="text-stone-600">{m.type}</span>
+                  <span className="text-stone-500 w-11 capitalize text-[10px]">{key}</span>
+                  <span className="text-stone-700">{m.type}</span>
                 </div>
               );
             })}
             {manifest.style.materials.joinery && (
               <div className="flex items-center gap-2 text-xs">
                 <Swatch hex={manifest.style.materials.joinery.hex} />
-                <span className="text-stone-400 w-11 text-[10px]">joinery</span>
-                <span className="text-stone-600">{manifest.style.materials.joinery.type}</span>
+                <span className="text-stone-500 w-11 text-[10px]">joinery</span>
+                <span className="text-stone-700">{manifest.style.materials.joinery.type}</span>
               </div>
             )}
             {manifest.style.materials.fixtures && (
               <div className="flex items-center gap-2 text-xs">
                 <Swatch hex={manifest.style.materials.fixtures.hex} />
-                <span className="text-stone-400 w-11 text-[10px]">fixtures</span>
-                <span className="text-stone-600">{manifest.style.materials.fixtures.type}</span>
+                <span className="text-stone-500 w-11 text-[10px]">fixtures</span>
+                <span className="text-stone-700">{manifest.style.materials.fixtures.type}</span>
               </div>
             )}
           </div>
@@ -229,8 +243,8 @@ export default function ManifestPanel({
 
         {/* ── Furniture ──────────────────────────────────────────────── */}
         <section>
-          <h3 className="text-[9px] uppercase tracking-wider text-stone-400 mb-2">Furniture · from renders</h3>
-          <p className="text-[10px] text-stone-600 capitalize mb-2">
+          <h3 className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-2">Furniture · from renders</h3>
+          <p className="text-[10px] text-stone-700 capitalize mb-2">
             {manifest.style.furniture.style.replace(/-/g, " ")}
           </p>
           <div className="flex flex-col gap-1">
@@ -238,7 +252,7 @@ export default function ManifestPanel({
               {tones.map((hex, i) => (
                 <div key={i} className="flex items-center gap-1">
                   <Swatch hex={hex} title={["body", "dark accent", "warm accent"][i] ?? `tone ${i + 1}`} />
-                  <span className="text-[9px] text-stone-400">{["body", "dark", "warm"][i] ?? i}</span>
+                  <span className="text-[10px] text-stone-500">{["body", "dark", "warm"][i] ?? i}</span>
                 </div>
               ))}
             </div>
@@ -256,12 +270,12 @@ export default function ManifestPanel({
         {/* ── Room Observations ──────────────────────────────────────── */}
         {manifest.style.roomObservations && manifest.style.roomObservations.length > 0 && (
           <section>
-            <h3 className="text-[9px] uppercase tracking-wider text-stone-400 mb-2">Room Observations</h3>
+            <h3 className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-2">Room Observations</h3>
             <div className="space-y-1.5">
               {manifest.style.roomObservations.map((obs, i) => (
                 <div key={i} className="text-[10px]">
-                  <span className="font-medium text-stone-600 capitalize">{obs.roomType}: </span>
-                  <span className="text-stone-400">{obs.notes}</span>
+                  <span className="font-medium text-stone-700 capitalize">{obs.roomType}: </span>
+                  <span className="text-stone-500">{obs.notes}</span>
                 </div>
               ))}
             </div>
@@ -270,25 +284,25 @@ export default function ManifestPanel({
 
         {/* ── Typography ─────────────────────────────────────────────── */}
         <section>
-          <h3 className="text-[9px] uppercase tracking-wider text-stone-400 mb-1.5">Typography</h3>
-          <p className="text-[10px] text-stone-600">
-            <span className="text-stone-400">Heading </span>{manifest.style.typography.heading}
+          <h3 className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-1.5">Typography</h3>
+          <p className="text-[10px] text-stone-700">
+            <span className="text-stone-500">Heading </span>{manifest.style.typography.heading}
           </p>
-          <p className="text-[10px] text-stone-600">
-            <span className="text-stone-400">Body </span>{manifest.style.typography.body}
+          <p className="text-[10px] text-stone-700">
+            <span className="text-stone-500">Body </span>{manifest.style.typography.body}
           </p>
         </section>
 
         {/* ── Geometry ───────────────────────────────────────────────── */}
         <section>
-          <h3 className="text-[9px] uppercase tracking-wider text-stone-400 mb-2">
+          <h3 className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-2">
             Geometry · {manifest.geometry.rooms.length} rooms · {manifest.geometry.totalAreaM2} m²
           </h3>
           <div className="space-y-0.5">
             {manifest.geometry.rooms.map((room) => (
               <div key={room.id} className="flex items-center justify-between text-[10px]">
-                <span className="text-stone-600">{room.label}</span>
-                <span className="text-stone-400 tabular-nums font-mono">
+                <span className="text-stone-700">{room.label}</span>
+                <span className="text-stone-500 tabular-nums font-mono">
                   {room.bounds.w.toFixed(1)}×{room.bounds.h.toFixed(1)}m
                 </span>
               </div>
@@ -298,13 +312,29 @@ export default function ManifestPanel({
 
         {/* ── Raw JSON ───────────────────────────────────────────────── */}
         <section>
-          <button
-            onClick={() => setJsonOpen((o) => !o)}
-            className="w-full text-left text-[9px] uppercase tracking-wider text-stone-400 hover:text-stone-600 flex items-center justify-between mb-2"
-          >
-            <span>Raw JSON</span>
-            <span>{jsonOpen ? "▲" : "▼"}</span>
-          </button>
+          <div className="flex items-center justify-between mb-2">
+            <button
+              onClick={() => setJsonOpen((o) => !o)}
+              className="text-[9px] uppercase tracking-wider text-stone-400 hover:text-stone-600 flex items-center gap-1"
+            >
+              <span>Raw JSON</span>
+              <span>{jsonOpen ? "▲" : "▼"}</span>
+            </button>
+            <button
+              onClick={() => {
+                const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${manifest.project.id}-manifest.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="text-[9px] text-[#410e2b] hover:text-[#5a1340] font-medium transition-colors"
+            >
+              ↓ Download
+            </button>
+          </div>
           {jsonOpen && (
             <pre className="text-[9px] text-stone-600 bg-stone-50 rounded p-2 overflow-x-auto max-h-56 overflow-y-auto border border-stone-100 leading-relaxed">
               {JSON.stringify(manifest, null, 2)}
@@ -316,7 +346,7 @@ export default function ManifestPanel({
       {/* ── Hash badges ────────────────────────────────────────────────── */}
       <div className="px-4 py-3 border-t border-stone-100 space-y-2">
         <HashBadge
-          label="Style hash · brand fingerprint"
+          label="Brand hash · style fingerprint"
           hash={styleHash}
           color="#410e2b"
           copied={copiedField === "style"}
@@ -329,8 +359,8 @@ export default function ManifestPanel({
           copied={copiedField === "geo"}
           onClick={() => copy(geometryHash, "geo")}
         />
-        <p className="text-[9px] text-stone-400 leading-tight pt-0.5">
-          Style hash is identical across all lots in the same project.
+        <p className="text-[9px] text-stone-500 leading-tight pt-0.5">
+          Brand hash is identical across all lots using the same brand.
           Geometry hash is unique per floor plan.
         </p>
       </div>

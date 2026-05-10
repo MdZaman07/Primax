@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { ProjectManifest } from "@/lib/manifest";
-import type { BrandEntry } from "@/lib/brands";
+import type { BrandRecord } from "@/lib/brandStore";
 import type { ProjectEntry } from "@/lib/projectStore";
 
 export interface AnalyzeCompleteArgs {
@@ -12,7 +12,7 @@ export interface AnalyzeCompleteArgs {
 }
 
 interface AnalyzeDrawerProps {
-  brands: BrandEntry[];
+  brands: BrandRecord[];
   onComplete: (args: AnalyzeCompleteArgs) => void;
   onClose: () => void;
 }

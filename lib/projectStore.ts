@@ -9,6 +9,7 @@ export interface ProjectEntry {
   geometry: GeometryManifest;
   extractedStyle: StyleManifest | null;
   defaultBrandKey: string | null; // auto-selected when this project is opened
+  analyzedStyleHash: string | null; // SHA-256[:8] of AI-extracted style at analysis time — audit record
   createdAt: string; // ISO string — safe across the server→client boundary
 }
 
@@ -19,12 +20,19 @@ export async function seedProjectsIfEmpty(): Promise<void> {
 
   // Lazy import to avoid circular dependency (ascent-manifest → brands → here)
   const { ascentManifest } = await import("./ascent-manifest");
+  const { createHash } = await import("crypto");
+  const ascentStyleHash = createHash("sha256")
+    .update(JSON.stringify(ascentManifest.style))
+    .digest("hex")
+    .slice(0, 8);
+
   await db.collection(COLLECTION).insertOne({
     projectId: ascentManifest.project.id,
     name: ascentManifest.project.name,
     geometry: ascentManifest.geometry,
     extractedStyle: ascentManifest.style,
     defaultBrandKey: "ascent",
+    analyzedStyleHash: ascentStyleHash,
     createdAt: new Date().toISOString(),
   });
 }

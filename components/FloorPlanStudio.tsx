@@ -5,19 +5,19 @@ import ManifestPanel from "./ManifestPanel";
 import ViewerPanel from "./ViewerPanel";
 import AnalyzeDrawer, { type AnalyzeCompleteArgs } from "./AnalyzeDrawer";
 import type { ProjectManifest } from "@/lib/manifest";
-import { styleHash, geometryHash } from "@/lib/hash";
-import type { BrandEntry } from "@/lib/brands";
+import { geometryHash } from "@/lib/hash";
+import type { BrandRecord } from "@/lib/brandStore";
 import type { ProjectEntry } from "@/lib/projectStore";
 import { ascentManifest } from "@/lib/ascent-manifest";
 
 interface FloorPlanStudioProps {
   initialProjects: ProjectEntry[];
-  initialBrands: BrandEntry[];
+  initialBrands: BrandRecord[];
 }
 
 export default function FloorPlanStudio({ initialProjects, initialBrands }: FloorPlanStudioProps) {
   const [projects, setProjects] = useState<ProjectEntry[]>(initialProjects);
-  const [brands, setBrands] = useState<BrandEntry[]>(initialBrands);
+  const [brands, setBrands] = useState<BrandRecord[]>(initialBrands);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     initialProjects[0]?.projectId ?? null
   );
@@ -49,10 +49,10 @@ export default function FloorPlanStudio({ initialProjects, initialBrands }: Floo
     return { ...ascentManifest, style: brand?.style ?? ascentManifest.style };
   }, [projects, selectedProjectId, brands, selectedBrandKey, tempManifest]);
 
-  const sHash = useMemo(() => styleHash(activeManifest), [activeManifest]);
-  const gHash = useMemo(() => geometryHash(activeManifest), [activeManifest]);
-
   const activeBrand = selectedBrandKey ? brands.find((b) => b.key === selectedBrandKey) : null;
+
+  const sHash = activeBrand?.styleHash ?? "";
+  const gHash = useMemo(() => geometryHash(activeManifest), [activeManifest]);
 
   const handleAnalyzeComplete = ({ project, tempManifest: tm, brandKey }: AnalyzeCompleteArgs) => {
     if (project) {
@@ -67,7 +67,7 @@ export default function FloorPlanStudio({ initialProjects, initialBrands }: Floo
     if (brandKey && !brands.find((b) => b.key === brandKey)) {
       fetch("/api/brands")
         .then((r) => r.json())
-        .then((fresh: BrandEntry[]) => setBrands(fresh))
+        .then((fresh: BrandRecord[]) => setBrands(fresh))
         .catch(() => null);
     }
     setSelectedBrandKey(brandKey ?? brands[0]?.key ?? null);

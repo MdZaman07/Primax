@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { listProjects, saveProject } from "@/lib/projectStore";
 import { GeometryManifestSchema, StyleManifestSchema } from "@/lib/manifest";
@@ -23,6 +24,9 @@ export async function POST(req: NextRequest) {
 
     const parsedGeometry = GeometryManifestSchema.parse(geometry);
     const parsedStyle = extractedStyle ? StyleManifestSchema.parse(extractedStyle) : null;
+    const styleHashValue = parsedStyle
+      ? createHash("sha256").update(JSON.stringify(parsedStyle)).digest("hex").slice(0, 8)
+      : null;
 
     const saved = await saveProject({
       projectId,
@@ -30,6 +34,7 @@ export async function POST(req: NextRequest) {
       geometry: parsedGeometry,
       extractedStyle: parsedStyle,
       defaultBrandKey: defaultBrandKey ?? null,
+      analyzedStyleHash: styleHashValue,
     });
 
     return NextResponse.json(saved);

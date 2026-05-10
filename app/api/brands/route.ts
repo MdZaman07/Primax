@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "key, name, and style are required" }, { status: 400 });
     }
     const parsedStyle = StyleManifestSchema.parse(style);
-    await saveBrand({ key, name, developer: developer ?? "", description: description ?? "", style: parsedStyle });
-    return NextResponse.json({ ok: true });
+    const { styleHash } = await saveBrand({ key, name, developer: developer ?? "", description: description ?? "", style: parsedStyle });
+    return NextResponse.json({ ok: true, styleHash });
   } catch (e) {
     const message = e instanceof Error ? e.message : "DB error";
     return NextResponse.json({ error: message }, { status: 500 });
